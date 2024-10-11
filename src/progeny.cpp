@@ -60,7 +60,12 @@ int main(int argc, char* argv[])
     // Initialization
     //---------------------------------------------------------
     InitWindow(screenWidth, screenHeight, "");
-
+    
+    // Define camera to look into 3d world
+    Camera3D camera = {0};
+    camera.position = (Vector3){ 0.0f, 10.0f, 10.0f };  // Camera position
+    camera.target = (Vector3){ 0.0f, 10.0f, 10.0f };    // Camera Looking at point
+    camera.up
     InitAudioDevice();      // Initialize audio device
 
     // Load global data (assets that must be available in all screens, i.e. font)
