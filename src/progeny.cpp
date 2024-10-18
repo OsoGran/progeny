@@ -33,7 +33,7 @@ Sound fxCoin = { 0 };
 //----------------------------------------------------------------------------------
 static const int screenWidth = 800;
 static const int screenHeight = 450;
-
+static const int targetFPS = 60;
 // Required variables to manage screen transitions (fade-in, fade-out)
 static float transAlpha = 0.0f;
 static bool onTransition = false;
@@ -59,13 +59,20 @@ int main(int argc, char* argv[])
 {
     // Initialization
     //---------------------------------------------------------
-    InitWindow(screenWidth, screenHeight, "");
+    InitWindow(screenWidth, screenHeight, "progeny");
     
     // Define camera to look into 3d world
     Camera3D camera = {0};
     camera.position = (Vector3){ 0.0f, 10.0f, 10.0f };  // Camera position
     camera.target = (Vector3){ 0.0f, 10.0f, 10.0f };    // Camera Looking at point
-    camera.up
+    camera.up = {Vector3}(0.0f, 1.0f, 0.0f);            // Camera up vector 
+    camera.fovy = 45.0                                  // Camera field of view Y
+    camera.projection = CAMERA_PERSPECTIVE;             // Camera mode type
+
+    Vector3 cubePosition = { 0.0f, 0.0f, 0.0f};
+
+    DisableCursor();        // Limit cursor to relative movement inside the window
+
     InitAudioDevice();      // Initialize audio device
 
     // Load global data (assets that must be available in all screens, i.e. font)
@@ -81,9 +88,9 @@ int main(int argc, char* argv[])
     InitLogoScreen();
 
 #if defined(PLATFORM_WEB)
-    emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
+    emscripten_set_main_loop(UpdateDrawFrame, targetFPS, 1);
 #else
-    SetTargetFPS(60);       // Set our game to run at 60 frames-per-second
+    SetTargetFPS(targetFPS);       // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
@@ -92,7 +99,19 @@ int main(int argc, char* argv[])
         UpdateDrawFrame();
     }
 #endif
+    
+    // Update
+    //--------------------------------------------------------------------------------------
+    UpdateCamera(&camera, CAMERA_FREE);
 
+    if(IsKeyPressed('Z')) camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
+    //--------------------------------------------------------------------------------------
+
+
+    // Draw
+    //--------------------------------------------------------------------------------------
+
+    
     // De-Initialization
     //--------------------------------------------------------------------------------------
     // Unload current screen data before closing
